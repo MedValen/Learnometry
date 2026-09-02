@@ -1,0 +1,739 @@
+<title>Learnometry Adaptive Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  /* Neutrals carry a slight blue-green bias to sit with the repo accent. */
+  --ground:#f4f6f7;
+  --surface:#ffffff;
+  --surface-2:#eef1f3;
+  --ink:#171b1f;
+  --ink-soft:#4d5862;
+  --ink-faint:#7e8b96;
+  --rule:#dde3e7;
+  --rule-strong:#c3ccd3;
+
+  /* Accent is lifted from the existing repo tokens, not invented. */
+  --accent:#2f6f8f;
+  --accent-soft:#e6eff4;
+
+  /* Product mastery ramp. Semantic only - never decorative. */
+  --m-red:#b4443a;
+  --m-orange:#bf6f36;
+  --m-yellow:#a8861a;
+  --m-lgreen:#5e9a63;
+  --m-dgreen:#2e7d5b;
+
+  --warn:#8a5a12;
+  --warn-soft:#faf1de;
+
+  --measure:68ch;
+  --f-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#13171a;
+    --surface:#1a1f23;
+    --surface-2:#222930;
+    --ink:#e4eaee;
+    --ink-soft:#a3b0ba;
+    --ink-faint:#71808b;
+    --rule:#2a323a;
+    --rule-strong:#3c4650;
+    --accent:#79b9d8;
+    --accent-soft:#1a2a33;
+    --m-red:#dd8078;
+    --m-orange:#d9975c;
+    --m-yellow:#c9ac4e;
+    --m-lgreen:#89bd8d;
+    --m-dgreen:#63bf95;
+    --warn:#d6ab63;
+    --warn-soft:#2a2418;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#13171a;
+  --surface:#1a1f23;
+  --surface-2:#222930;
+  --ink:#e4eaee;
+  --ink-soft:#a3b0ba;
+  --ink-faint:#71808b;
+  --rule:#2a323a;
+  --rule-strong:#3c4650;
+  --accent:#79b9d8;
+  --accent-soft:#1a2a33;
+  --m-red:#dd8078;
+  --m-orange:#d9975c;
+  --m-yellow:#c9ac4e;
+  --m-lgreen:#89bd8d;
+  --m-dgreen:#63bf95;
+  --warn:#d6ab63;
+  --warn-soft:#2a2418;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--f-body);font-size:16px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------------------------------------------------------------- shell */
+.shell{max-width:1180px;margin:0 auto;padding:0 28px;
+  display:grid;grid-template-columns:210px minmax(0,1fr);gap:56px;align-items:start}
+
+/* ------------------------------------------------------------------ rail */
+.rail{position:sticky;top:0;padding:64px 0 40px;font-family:var(--f-mono);font-size:12px}
+.rail .railhead{
+  text-transform:uppercase;letter-spacing:.13em;color:var(--ink-faint);
+  font-size:10.5px;padding-bottom:10px;border-bottom:1px solid var(--rule);margin-bottom:12px;
+}
+.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+.rail a{
+  display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:baseline;
+  text-decoration:none;color:var(--ink-soft);padding:5px 8px;border-radius:4px;line-height:1.35;
+}
+.rail a:hover{background:var(--accent-soft);color:var(--accent)}
+.rail a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.rail .n{color:var(--ink-faint);font-variant-numeric:tabular-nums}
+.rail .ph{margin-top:18px}
+
+/* ------------------------------------------------------------------ main */
+main{padding:64px 0 120px;min-width:0}
+.wrap{max-width:var(--measure)}
+
+.eyebrow{
+  font-family:var(--f-mono);font-size:11px;text-transform:uppercase;
+  letter-spacing:.15em;color:var(--accent);margin:0 0 14px;
+}
+h1{
+  font-family:var(--f-display);font-weight:500;font-size:clamp(38px,5.2vw,58px);
+  line-height:1.04;letter-spacing:-.02em;margin:0 0 18px;text-wrap:balance;
+}
+.standfirst{
+  font-size:19px;line-height:1.6;color:var(--ink-soft);max-width:60ch;margin:0 0 30px;
+  font-family:var(--f-display);
+}
+.meta{
+  font-family:var(--f-mono);font-size:11.5px;color:var(--ink-faint);
+  display:flex;flex-wrap:wrap;gap:6px 20px;padding:14px 0;
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin-bottom:60px;
+}
+.meta b{font-weight:500;color:var(--ink-soft)}
+
+section{margin-bottom:64px;scroll-margin-top:28px}
+h2{
+  font-family:var(--f-display);font-weight:500;font-size:31px;line-height:1.15;
+  letter-spacing:-.015em;margin:0 0 6px;text-wrap:balance;
+  display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:baseline;
+}
+h2 .num{
+  font-family:var(--f-mono);font-size:12px;font-weight:500;color:var(--accent);
+  font-variant-numeric:tabular-nums;
+}
+h2 + .lede{color:var(--ink-soft);margin:0 0 22px;max-width:var(--measure)}
+h3{
+  font-family:var(--f-body);font-weight:600;font-size:15px;margin:30px 0 10px;
+  letter-spacing:.005em;
+}
+h4{
+  font-family:var(--f-mono);font-weight:500;font-size:11px;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--ink-faint);margin:24px 0 8px;
+}
+p{margin:0 0 14px;max-width:var(--measure)}
+ul,ol{margin:0 0 14px;padding-left:20px;max-width:var(--measure)}
+li{margin-bottom:6px}
+a{color:var(--accent)}
+strong{font-weight:600}
+code{
+  font-family:var(--f-mono);font-size:.87em;background:var(--surface-2);
+  padding:1px 5px;border-radius:3px;
+}
+
+/* ---------------------------------------------------------------- blocks */
+.formula{
+  font-family:var(--f-mono);font-size:13px;line-height:1.75;
+  background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--accent);
+  border-radius:0 6px 6px 0;padding:16px 20px;margin:0 0 16px;
+  overflow-x:auto;white-space:pre;
+}
+.formula .c{color:var(--ink-faint)}
+.formula .k{color:var(--accent)}
+
+.callout{
+  background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 32%,transparent);
+  border-radius:8px;padding:20px 24px;margin:0 0 22px;max-width:var(--measure);
+}
+.callout h3{margin-top:0;color:var(--warn);font-size:14px;
+  font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.callout p:last-child{margin-bottom:0}
+
+.note{
+  border-left:2px solid var(--rule-strong);padding-left:16px;color:var(--ink-soft);
+  font-size:15px;margin:0 0 16px;max-width:var(--measure);
+}
+
+/* ---------------------------------------------------------------- tables */
+.tw{overflow-x:auto;margin:0 0 18px;border:1px solid var(--rule);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.5}
+th{
+  font-family:var(--f-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;
+  font-weight:500;color:var(--ink-faint);background:var(--surface-2);white-space:nowrap;
+}
+tr:last-child td{border-bottom:0}
+td.mono,th.mono{font-family:var(--f-mono);font-size:12.5px;white-space:nowrap}
+.num-col{font-variant-numeric:tabular-nums;text-align:right}
+
+/* ------------------------------------------------------------ mastery bar */
+.ramp{display:flex;flex-direction:column;gap:0;margin:0 0 18px;max-width:var(--measure);
+  border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:var(--surface)}
+.ramp .band{display:grid;grid-template-columns:14px 128px 1fr auto;gap:14px;align-items:center;
+  padding:9px 14px;border-bottom:1px solid var(--rule);font-size:13.5px}
+.ramp .band:last-child{border-bottom:0}
+.ramp .sw{width:14px;height:14px;border-radius:3px}
+.ramp .lbl{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.09em}
+.ramp .rng{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-faint);
+  font-variant-numeric:tabular-nums;text-align:right}
+.b-red .sw{background:var(--m-red)} .b-red .lbl{color:var(--m-red)}
+.b-org .sw{background:var(--m-orange)} .b-org .lbl{color:var(--m-orange)}
+.b-yel .sw{background:var(--m-yellow)} .b-yel .lbl{color:var(--m-yellow)}
+.b-lgn .sw{background:var(--m-lgreen)} .b-lgn .lbl{color:var(--m-lgreen)}
+.b-dgn .sw{background:var(--m-dgreen)} .b-dgn .lbl{color:var(--m-dgreen)}
+
+/* ---------------------------------------------------------------- verdict */
+.verdicts{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+  border-radius:8px;overflow:hidden;margin:0 0 20px}
+.verdict{background:var(--surface);padding:14px 18px;display:grid;
+  grid-template-columns:76px 1fr;gap:16px;align-items:baseline}
+.verdict .tag{font-family:var(--f-mono);font-size:10.5px;text-transform:uppercase;
+  letter-spacing:.1em;font-weight:600}
+.verdict p{margin:0;font-size:14px}
+.v-keep .tag{color:var(--m-dgreen)}
+.v-ext .tag{color:var(--accent)}
+.v-new .tag{color:var(--m-orange)}
+.v-cut .tag{color:var(--m-red)}
+
+/* ----------------------------------------------------------------- phases */
+.phase{display:grid;grid-template-columns:52px 1fr;gap:18px;padding:16px 0;
+  border-top:1px solid var(--rule);max-width:var(--measure)}
+.phase:last-child{border-bottom:1px solid var(--rule)}
+.phase .pn{font-family:var(--f-mono);font-size:11px;color:var(--accent);
+  font-variant-numeric:tabular-nums;padding-top:3px;letter-spacing:.06em}
+.phase h3{margin:0 0 4px;font-size:15px}
+.phase p{margin:0 0 6px;font-size:14px;color:var(--ink-soft)}
+.phase .ships{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-faint)}
+.phase.now{background:var(--accent-soft);margin-left:-16px;margin-right:-16px;
+  padding-left:16px;padding-right:16px;border-radius:6px;border-top-color:transparent}
+.phase.now + .phase{border-top-color:var(--rule)}
+.pill{display:inline-block;font-family:var(--f-mono);font-size:10px;text-transform:uppercase;
+  letter-spacing:.1em;padding:2px 7px;border-radius:3px;background:var(--accent);color:var(--surface);
+  vertical-align:2px;margin-left:8px}
+
+/* -------------------------------------------------------------- tree/code */
+.tree{font-family:var(--f-mono);font-size:12.5px;line-height:1.75;background:var(--surface);
+  border:1px solid var(--rule);border-radius:8px;padding:18px 22px;overflow-x:auto;
+  white-space:pre;margin:0 0 18px}
+.tree .new{color:var(--accent)}
+.tree .keep{color:var(--ink-faint)}
+
+hr.div{border:0;border-top:1px solid var(--rule);margin:0 0 34px;max-width:var(--measure)}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;gap:0;padding:0 20px}
+  .rail{position:static;padding:32px 0 0}
+  .rail ol{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:2px}
+  .rail .ph{margin-top:2px}
+  main{padding-top:36px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="shell">
+
+<nav class="rail">
+  <div class="railhead">Deliverables</div>
+  <ol>
+    <li><a href="#a1"><span class="n">01</span><span>Assessment</span></a></li>
+    <li><a href="#a2"><span class="n">02</span><span>What we reuse</span></a></li>
+    <li><a href="#a3"><span class="n">03</span><span>Data model</span></a></li>
+    <li><a href="#a4"><span class="n">04</span><span>Adaptive engine</span></a></li>
+    <li><a href="#a5"><span class="n">05</span><span>Mastery formula</span></a></li>
+    <li><a href="#a6"><span class="n">06</span><span>Selection formula</span></a></li>
+    <li><a href="#a7"><span class="n">07</span><span>File changes</span></a></li>
+    <li><a href="#a8"><span class="n">08</span><span>Phase plan</span></a></li>
+  </ol>
+  <div class="railhead ph">Also</div>
+  <ol>
+    <li><a href="#conflict"><span class="n">!</span><span>The one conflict</span></a></li>
+    <li><a href="#ownlayer"><span class="n">3</span><span>Her own layer</span></a></li>
+    <li><a href="#scopedrills"><span class="n">4</span><span>Scope &amp; drills</span></a></li>
+    <li><a href="#phase5"><span class="n">5</span><span>App &amp; notes</span></a></li>
+    <li><a href="#phase6"><span class="n">6</span><span>Question markup</span></a></li>
+    <li><a href="#audit"><span class="n">✓</span><span>Audit &amp; backups</span></a></li>
+    <li><a href="#book"><span class="n">§</span><span>First Aid ingest</span></a></li>
+  </ol>
+</nav>
+
+<main>
+<div class="wrap">
+  <p class="eyebrow">Architecture proposal · before implementation</p>
+  <h1>The Adaptive Engine</h1>
+  <p class="standfirst">Turning Symbol Span from a one-shot question generator into a system with memory — one that knows what she knows, what has decayed, and what is worth her next twenty minutes.</p>
+  <p class="renamed" style="margin:18px 0 0;padding:12px 16px;border-left:3px solid var(--accent,#2f6f8f);background:rgba(47,111,143,.07);font-size:15px;line-height:1.55">
+    <b>Since this was written</b> — the app shipped and was renamed <b>Learnometry</b>.
+    It now supports more than one student, each with their own profile from either
+    a neuropsychological report or an in-app screener, so the single hard-coded
+    profile described below is one seeded user rather than a global constant.
+    Everything else here was built as proposed. This page is kept as the record
+    of the design decision, not as current documentation — the README is that.
+  </p>
+  <div class="meta">
+    <span><b>Repo</b> symbol-span · 2,795 lines · no VCS yet</span>
+    <span><b>Student</b> SGU Term 4</span>
+    <span><b>Reference</b> First Aid 2023, 849pp</span>
+  </div>
+</div>
+
+<!-- ============================================================ 01 -->
+<section id="a1">
+  <h2><span class="num">01</span><span>Current architecture</span></h2>
+  <p class="lede">The existing app is a good generator and a nonexistent system of record. Everything you asked for lives on the second half.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Layer</th><th>Today</th><th>Verdict for this build</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">learner_profile.py</td><td>WAIS-5 contract injected into every prompt</td><td>Load-bearing. Every new prompt must carry it.</td></tr>
+      <tr><td class="mono">claude.py</td><td>Streaming, structured output, beta degradation</td><td>Reuse unchanged.</td></tr>
+      <tr><td class="mono">ingest.py</td><td>PDF → Files API; docx/pptx/txt → text</td><td>Reuse extractors. 100 MB cap blocks First Aid.</td></tr>
+      <tr><td class="mono">generate.py</td><td>analyze → concepts → questions, per session</td><td>Split: concepts become durable, questions become a bank.</td></tr>
+      <tr><td class="mono">app.py</td><td>16 routes, in-memory <code>_sources</code> dict</td><td>Split into routers. State moves to SQLite.</td></tr>
+      <tr><td class="mono">frontend/</td><td>671-line app.js, global <code>state</code>, tab switcher</td><td>Modularize. Keep the renderer and quiz core.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The three blockers</h3>
+  <p><strong>Concept identity is session-scoped.</strong> <code>concept_id</code> is <code>"c1"</code>, <code>"c2"</code> — generated fresh per <code>analyze()</code> call and meaningless across sessions. Mastery tracking is impossible until concepts have stable global identity. This is the root blocker and it moves to Phase 1.</p>
+  <p><strong>No attempt history.</strong> Sessions save as opaque JSON blobs; nothing is queryable. Your requirement 19 — "do not throw historical attempts away" — is the single hardest thing to retrofit, so it goes in first.</p>
+  <p><strong>The textbook doesn't fit.</strong> First Aid is 849 pages / 257 MB, over the 100 MB upload cap and far past what one request can hold. It needs section-level chunked ingestion, which is a different pipeline from the existing lecture-file route.</p>
+
+  <div class="note">The PDF has a clean text layer (~2.6k chars/page, no scanned images) and every page carries a running header with its section breadcrumb — <code>Pharmacology ` PHARMACOLOGY—AUTONOMIC DRUGS</code>. That header is the taxonomy hook, and it means ingestion runs locally without sending the book anywhere.</div>
+</section>
+
+<!-- ============================================================ 02 -->
+<section id="a2">
+  <h2><span class="num">02</span><span>What we reuse</span></h2>
+  <p class="lede">No parallel systems. Four existing pieces already do what the spec asks for under different names.</p>
+
+  <div class="verdicts">
+    <div class="verdict v-keep"><span class="tag">Reuse</span><p><strong>Three-way scoring already is your confidence input.</strong> The app scores <em>knew it / knew it, needed the word / didn't know it</em>. Your §5 asks for <em>knew it / unsure / guessed</em>. Same axis — the existing one is inferred from cue use, yours is self-reported. Keep both signals on one <code>confidence</code> field and let self-report override the inference.</p></div>
+    <div class="verdict v-keep"><span class="tag">Reuse</span><p><strong>The retrieval ladder is your question-format axis.</strong> <code>recognition / cued_recall / discrimination / application / visual_map</code> feeds §8's format analytics directly. It is <em>orthogonal</em> to your L1–L4 difficulty axis, not a duplicate — keep both and track them independently, exactly as §2 asks.</p></div>
+    <div class="verdict v-ext"><span class="tag">Extend</span><p><strong>The concept inventory becomes the concept table.</strong> <code>analyze()</code> already emits name, one-liner, yield tier, and <code>confusable_with</code>. That last field is a ready-made edge for the §18 concept graph. Add slug identity and persist.</p></div>
+    <div class="verdict v-ext"><span class="tag">Extend</span><p><strong><code>md()</code>, the quiz core, and the mastery palette carry over.</strong> The renderer, option grading, fuzzy answer matching, and the CSS token system all survive. The heatmap ramp extends the existing <code>--good</code>/<code>--bad</code> tokens rather than introducing a second color language.</p></div>
+    <div class="verdict v-new"><span class="tag">New</span><p><strong>Genuinely new:</strong> persistence, scheduling, mastery math, selection, the concept graph, book ingestion, Anki export, progression, analytics. These have no existing counterpart to reuse.</p></div>
+  </div>
+</section>
+
+<!-- ======================================================== CONFLICT -->
+<section id="conflict">
+  <h2><span class="num">!</span><span>One conflict to settle first</span></h2>
+  <p class="lede">Three items in the game spec contradict the neuropsych report this codebase is built on. All three are fixable without losing the mechanic.</p>
+
+  <div class="callout">
+    <h3>Response time must not feed mastery</h3>
+    <p>§4 lists <code>averageResponseTime</code> as a mastery variable and §19 stores <code>responseTime</code>. Her Color Naming is at the 5th percentile — measurably slow lexical retrieval, plausibly compounded by ESL. Feeding response time into mastery would systematically score her down for the exact deficit the report says never to penalize, and it would do so invisibly.</p>
+    <p><strong>Resolution:</strong> store it, never let it touch the mastery formula. Use it only as a within-concept trend against her own baseline ("this concept is getting faster for you"), never as an absolute or cross-concept comparison.</p>
+  </div>
+
+  <div class="callout">
+    <h3>Momentum yes, time pressure no</h3>
+    <p>"Next question appears almost instantly" and "reduce opportunities to leave" are good design and I'll build them. But extended time is a formal accommodation, and countdown timers, speed bonuses, or a decaying streak clock would each convert a support into a stressor. The report also notes this working-memory pattern is produced by anxiety — a system that generates anxiety degrades the very thing it measures.</p>
+    <p><strong>Resolution:</strong> fast <em>transitions</em>, never a timed <em>answer</em>. Streaks count correct answers, not consecutive days, and never reset punitively for a break. Progress bars fill; nothing drains.</p>
+  </div>
+
+  <div class="callout">
+    <h3>Boss questions cap at three concepts</h3>
+    <p>§12 wants boss questions combining several concepts from a system. Multi-concept integration at L4 is exactly right for her intact fluid reasoning (FRI 101) — but the premises must live in an on-screen table, not in her head. Digits Forward = 6 means a four-premise stem tests registration, not medicine.</p>
+    <p><strong>Resolution:</strong> boss questions get L4 difficulty and multi-system content, hard-capped at 3 held elements, with every premise rendered in a visible table.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 03 -->
+<section id="a3">
+  <h2><span class="num">03</span><span>Data model</span></h2>
+  <p class="lede">SQLite. Standard library, single file, fully queryable, survives restarts. JSON files fail requirement 19 the moment you want to ask a question of the history; Postgres is ceremony for one user on one laptop.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Table</th><th>Holds</th><th>Key columns</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">topic</td><td>Hierarchy: system → discipline → subtopic</td><td class="mono">id, parent_id, name, depth, path</td></tr>
+      <tr><td class="mono">concept</td><td>Stable atomic unit of knowledge</td><td class="mono">id (slug), topic_id, name, aliases, high_yield, hy_tier</td></tr>
+      <tr><td class="mono">concept_edge</td><td>The §18 graph</td><td class="mono">src, dst, relation, weight</td></tr>
+      <tr><td class="mono">question</td><td>Persistent bank, not per-session</td><td class="mono">id, stem, options, difficulty, format, concept_ids, source_refs</td></tr>
+      <tr><td class="mono">attempt</td><td>Append-only. Never deleted.</td><td class="mono">ts, question_id, correct, confidence, error_type, rt_ms, mastery_before/after</td></tr>
+      <tr><td class="mono">mastery</td><td>One row per concept, recomputed on write</td><td class="mono">concept_id, mastery, est_confidence, retention, streak, by_difficulty</td></tr>
+      <tr><td class="mono">review</td><td>SM-2 schedule state</td><td class="mono">concept_id, ease, interval_d, due_at, reps, lapses</td></tr>
+      <tr><td class="mono">session</td><td>Session envelope + XP</td><td class="mono">id, mode, started, ended, xp, summary</td></tr>
+      <tr><td class="mono">source / source_section</td><td>Ingested docs, chunked with page refs</td><td class="mono">id, title, kind / section_path, page_start, page_end</td></tr>
+      <tr><td class="mono">exam</td><td>Upcoming exam windows</td><td class="mono">name, date, topic_ids</td></tr>
+      <tr><td class="mono">insight</td><td>Analytics, gated on sample size</td><td class="mono">kind, claim, effect, n, p, surfaced_at</td></tr>
+      <tr><td class="mono">progression</td><td>XP, level, streak, achievements</td><td class="mono">xp, level, streak, unlocked</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>Two decisions worth calling out. <strong>Mastery is a cache, not a source of truth</strong> — it is always recomputable from <code>attempt</code>, so a formula change is a backfill rather than a migration. And <strong><code>attempt</code> stores <code>mastery_before</code> and <code>mastery_after</code></strong>, which is what later makes "does she retain pharm better after flashcards?" answerable at all.</p>
+</section>
+
+<!-- ============================================================ 04 -->
+<section id="a4">
+  <h2><span class="num">04</span><span>Adaptive engine</span></h2>
+  <p class="lede">Two layers: a per-concept mastery model, and a per-question selector that treats your seven priorities as a composition target rather than a sort order.</p>
+
+  <h3>Color bands</h3>
+  <p>Bands read from <code>effectiveMastery</code>, which folds decay in so a stale concept drifts back down the ramp rather than flipping instantly.</p>
+  <div class="ramp">
+    <div class="band b-red"><span class="sw"></span><span class="lbl">Red · weak</span><span>Appears most often. Drives the priority queue.</span><span class="rng">&lt; 0.35</span></div>
+    <div class="band b-org"><span class="sw"></span><span class="lbl">Orange · developing</span><span>Frequent, difficulty ratcheting upward.</span><span class="rng">0.35 – 0.50</span></div>
+    <div class="band b-yel"><span class="sw"></span><span class="lbl">Yellow · inconsistent</span><span>Band <em>or</em> high variance in recent credit.</span><span class="rng">0.50 – 0.65</span></div>
+    <div class="band b-lgn"><span class="sw"></span><span class="lbl">Light green · strong</span><span>Spaced review only.</span><span class="rng">0.65 – 0.85</span></div>
+    <div class="band b-dgn"><span class="sw"></span><span class="lbl">Dark green · mastered</span><span>Requires retention &gt; 0.70 as well.</span><span class="rng">≥ 0.85</span></div>
+  </div>
+  <p class="note">Yellow is the one band that isn't purely a threshold. If the standard deviation of recent correctness reaches 0.45 — genuinely mixed, not merely mid-range — the concept reads yellow regardless of its mean. The override deliberately does not apply below orange: alternating right and wrong at 50% is weak, not inconsistent, and calling that yellow would understate it.</p>
+
+  <h3>Variant rotation</h3>
+  <p>The Keybr property you asked for: hammer the weakness, never the item. A concept carries questions tagged by <em>format</em> × <em>difficulty</em>. When a weak concept is selected, the engine picks the cell she has seen least recently, so CN III palsy returns as anatomy, then lesion localization, then pupillary findings, then a vignette — never the same stem twice in a row.</p>
+</section>
+
+<!-- ============================================================ 05 -->
+<section id="a5">
+  <h2><span class="num">05</span><span>Mastery formula</span></h2>
+  <p class="lede">Not percent correct. Recency-weighted credit, scaled by difficulty and self-reported confidence, shrunk toward a prior when the sample is thin.</p>
+
+  <div class="formula"><span class="c"># per attempt, in [0,1] for correct; negative pull for incorrect</span>
+<span class="k">difficultyWeight</span>  = {L1:0.60, L2:0.85, L3:1.00, L4:1.15}
+<span class="k">confidenceCredit</span>  correct  : knew 1.00 · unsure 0.75 · guessed 0.45
+                  incorrect: confident 1.60 · unsure 1.00 · guessed 0.70   <span class="c">(penalty multiplier)</span>
+
+credit_i = correct ? difficultyWeight · confidenceCredit
+                   : -0.5 · difficultyWeight · confidenceCredit
+
+<span class="c"># Two questions, two denominators - keeping them separate matters.</span>
+<span class="c"># 1. WHAT IS THE MEAN?  recency-weighted, newest attempt weight 1</span>
+w_i  = 0.85 ^ rank_i
+mean = Σ credit_i·w_i / Σ w_i
+
+<span class="c"># 2. HOW MUCH DO WE TRUST IT?  shrink by attempt COUNT, not by Σw</span>
+<span class="k">mastery</span> = clamp01( (mean·n + α·0.35) / (n + α) ),   n = min(attempts, 20), α = 3
+
+<span class="c"># decay is tracked separately and never overwrites mastery</span>
+stability      = interval_d · ease        <span class="c"># days; falls back to 1 + 20·mastery</span>
+<span class="k">retention</span>      = exp( -daysSinceReview / stability )
+<span class="k">forgettingRisk</span> = 1 - retention
+
+<span class="k">effectiveMastery</span> = mastery · (0.6 + 0.4 · retention)</div>
+
+  <p class="note">Those two denominators were one denominator in the first cut, and it produced a bug worth recording: <code>Σw</code> saturates near 6.4, so the prior kept about 30% of the weight forever and <em>dark green became mathematically unreachable</em> - sustained perfect Level 3 work topped out at 0.793 against a 0.85 threshold. Raising the decay constant to compensate then broke recency, ranking a declining student above an improving one. They are different questions and need different divisors.</p>
+
+<p>Four properties fall out of this. A confidently wrong answer costs about 3.5× what a hedged wrong answer costs, which is the misconception signal §5 asks for. Four attempts can't produce a green concept — the prior holds it down until there's evidence. And each practice level carries a hard mastery ceiling:</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Sustained practice at</th><th class="num-col">Mastery ceiling</th><th>Can reach mastered?</th></tr></thead>
+    <tbody>
+      <tr><td>Level 1, confident</td><td class="num-col mono">0.567</td><td>No</td></tr>
+      <tr><td>Level 2, unsure</td><td class="num-col mono">0.600</td><td>No</td></tr>
+      <tr><td>Level 3, confident</td><td class="num-col mono">0.915</td><td>Yes</td></tr>
+      <tr><td>Level 4, confident</td><td class="num-col mono">1.000</td><td>Yes</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>That is the point of tracking difficulty separately from mastery: <strong>you cannot master a concept by answering recall questions about it</strong>, however many you answer. The engine has to escalate, which is why <code>pick_cell</code> serves the hardest available variant once a concept passes 0.60.</p>
+
+  <p class="note">Three separate numbers get displayed, never collapsed: <strong>mastery</strong> (how well she knows it), <strong>retention</strong> (how likely that's still true), and <strong>estimateConfidence</strong> (how sure the <em>system</em> is, from effective sample size). Your §21 example — "Mastery 91% / Retention confidence 62% / Review due" — is exactly this.</p>
+</section>
+
+<!-- ============================================================ 06 -->
+<section id="a6">
+  <h2><span class="num">06</span><span>Selection formula</span></h2>
+  <p class="lede">Your §25 priority equation, made concrete — then deliberately loosened so sessions don't become identical.</p>
+
+  <div class="formula"><span class="k">priority</span>(concept) =
+      weakness^1.5                      <span class="c"># 1 - effectiveMastery, superlinear</span>
+    · (0.5 + 1.5 · highYield)           <span class="c"># 0.5x .. 2.0x</span>
+    · (0.3 + 0.7 · forgettingRisk)      <span class="c"># never 0: green still returns</span>
+    · examRelevance                     <span class="c"># 1.0, or up to 2.5x inside an exam window</span>
+    · (1 + max(0, accL1 - accL3))       <span class="c"># the difficultyGap term</span>
+    · cooldown                          <span class="c"># 0 if seen in last 6 items this session</span>
+
+<span class="c"># selection is softmax-sampled, not argmax, within each bucket</span>
+P(c) ∝ exp( priority(c) / τ ),  τ = 0.35</div>
+
+  <h3>Session composition</h3>
+  <p>Your seven priorities become quotas, so a session is a balanced draw rather than seven greedy picks:</p>
+  <div class="tw"><table>
+    <thead><tr><th>Bucket</th><th class="num-col">Share</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>Weak concepts</td><td class="num-col mono">35%</td><td>The core loop</td></tr>
+      <tr><td>High-yield gaps</td><td class="num-col mono">20%</td><td>Exam value per minute</td></tr>
+      <tr><td>Spaced repetition due</td><td class="num-col mono">20%</td><td>Retention maintenance</td></tr>
+      <tr><td>Recently missed</td><td class="num-col mono">10%</td><td>Same-session consolidation</td></tr>
+      <tr><td>Graph neighbors of missed</td><td class="num-col mono">5%</td><td>Isolated fact or whole cluster?</td></tr>
+      <tr><td>Mastered spot-check</td><td class="num-col mono">5%</td><td>Catches silent decay</td></tr>
+      <tr><td>New material</td><td class="num-col mono">5%</td><td>Forward progress</td></tr>
+    </tbody>
+  </table></div>
+  <p>Session modes reweight these quotas rather than running separate code paths — <em>Weak Areas</em> pushes bucket 1 to 70%, <em>Spaced Repetition Due</em> pushes bucket 3 to 80%, <em>Exam Cram</em> raises <code>examRelevance</code> and collapses buckets 6 and 7 to zero.</p>
+</section>
+
+<!-- ============================================================= BOOK -->
+<section id="book">
+  <h2><span class="num">§</span><span>First Aid ingestion</span></h2>
+  <p class="lede">Local extraction, structural mapping, zero verbatim storage.</p>
+  <ol>
+    <li><strong>Segment locally</strong> with pypdf. The running header gives every page its section path; the outline gives chapter boundaries. No upload, no API cost, no copy of the book leaving the machine.</li>
+    <li><strong>Build the topic tree</strong> from those section paths. First Aid's own hierarchy — <code>Renal → Physiology</code>, <code>Renal → Pathology</code>, <code>Renal → Pharmacology</code> — becomes the app's taxonomy directly. It is already the taxonomy the exam is written against.</li>
+    <li><strong>Extract concept names per section</strong> via Claude, one section at a time. What persists is the <em>name</em>, its topic path, its page range, and a high-yield estimate. Not the prose.</li>
+    <li><strong>Score high-yield</strong> from structural signals: presence in the Rapid Review section (pp. 730–760 — Classic Presentations, Classic Labs, Key Associations, Easily Confused Medications is a distilled high-yield index), density of coverage, cross-section recurrence, and repetition across her other uploaded materials.</li>
+    <li><strong>Generate questions from the concept name</strong>, not from the page text — Claude's own knowledge, anchored to the concept and its section, with a citation like <em>First Aid — Renal, Pathology (p. 641)</em>.</li>
+  </ol>
+  <div class="callout">
+    <h3>Copyright boundary</h3>
+    <p>The database stores concept names, topic paths, page references, and high-yield scores. It does not store extracted prose, tables, figures, or First Aid's mnemonics. Section text is held in memory during a single ingestion call and discarded. The user sees citations pointing into her own copy — never reproduced passages.</p>
+    <p>This is also the pedagogically correct call for her: First Aid's mnemonics are long verbal letter-strings, which the learner profile already rules out in favor of visual and spatial hooks.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 07 -->
+<section id="a7">
+  <h2><span class="num">07</span><span>File changes</span></h2>
+  <p class="lede">Additive. Nothing existing is deleted; <code>app.py</code> is the only file that gets restructured, into routers.</p>
+
+  <div class="tree"><span class="keep">backend/
+  __init__.py            claude.py           </span><span class="keep">← unchanged</span><span class="keep">
+  learner_profile.py                         </span><span class="keep">← unchanged, now injected everywhere</span><span class="keep">
+  ingest.py              generate.py         </span><span class="keep">← extended, not replaced</span>
+  <span class="new">db.py                  </span>schema, migrations, connection
+  <span class="new">models.py              </span>dataclasses mirroring the tables
+  <span class="new">taxonomy.py            </span>topic tree + First Aid mapping
+  <span class="new">mastery.py             </span>mastery / retention / decay  <span class="keep">— pure, unit-tested</span>
+  <span class="new">scheduler.py           </span>SM-2 + selection algorithm   <span class="keep">— pure, unit-tested</span>
+  <span class="new">bank.py                </span>question bank, variant rotation
+  <span class="new">ingest_book.py         </span>chunked textbook pipeline
+  <span class="new">analytics.py           </span>insights, sample-size gated
+  <span class="new">anki.py                </span>TSV/CSV export, card synthesis
+  <span class="new">gamify.py              </span>XP, levels, streaks, achievements
+  <span class="new">routes/                </span>study · mastery · sources · plan · export · game
+<span class="keep">frontend/
+  index.html  styles.css                     </span><span class="keep">← extended</span>
+  <span class="new">js/                    </span>api · md · store · session · heatmap · dashboard · anki
+<span class="new">tests/                   </span>mastery, scheduler, matcher — the math, not the UI
+<span class="new">docs/architecture.html   </span>this document</div>
+
+  <p class="note">Two modules are deliberately pure functions over plain data — <code>mastery.py</code> and <code>scheduler.py</code>. They're where every bug that matters will live, and keeping them free of database and network calls is what makes them testable against hand-built attempt histories.</p>
+</section>
+
+<!-- ============================================================ 3X -->
+<section id="ownlayer">
+  <h2><span class="num">3</span><span>Her own layer</span></h2>
+  <p class="lede">Terms, exams, a vault, a pinboard, captured instructor emphasis, and time-boxed plans. Added after the original eight were drawn up.</p>
+
+  <h3>A second axis, not a second taxonomy</h3>
+  <p>The First&nbsp;Aid tree says what a concept <em>is</em>. A term says when she <em>needs</em> it. Folding them together would have been the obvious move and the wrong one: an exam that owned its concepts would fork her history, so material drilled for the Renal midterm would start from zero when it reappeared on the final. Exams therefore <strong>reference</strong> topics and concepts and never own them, and a parent topic pulls in its whole subtree.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Surface</th><th>What it holds</th><th>Design call</th></tr></thead>
+    <tbody>
+      <tr><td>Terms &amp; courses</td><td>Her filing system</td><td>Deleting a term detaches its courses rather than cascading - losing exam history to a mis-click is the worse failure</td></tr>
+      <tr><td>Exams</td><td>Name, date, what it covers</td><td>Exam proximity was <em>already</em> in the priority formula, so adding an exam immediately changes what practice serves</td></tr>
+      <tr><td>Vault</td><td>Whiteboard photos, questions, handouts</td><td>Storage works with no API key. Reading an image is opt-in, per image, never on upload</td></tr>
+      <tr><td>Pinboard</td><td>Topics, mnemonics, images she flags</td><td>Nothing here is generated or scored. Everywhere else the engine decides; this is the one surface where she does</td></tr>
+      <tr><td>Emphasis</td><td>What a professor stressed</td><td>Proposes a priority boost; she confirms it</td></tr>
+      <tr><td>Study plan</td><td>A day-by-day schedule</td><td>Arithmetic computed, strategy generated - never the reverse</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout">
+    <h3>Emphasis proposes, she disposes</h3>
+    <p>"Dr. Nassar said acid-base is heavily tested" is often better evidence than any textbook weighting, and the original spec asked for it. But a misheard remark that silently raised a concept's priority for a month would be very hard to notice and impossible to trace.</p>
+    <p><strong>Resolution:</strong> a note is stored with who said it and how strongly, Claude proposes which concepts it points at, and the boost applies only when she confirms. It lives in <code>concept.emphasis_boost</code>, never folded into <code>high_yield</code>, so what her professor stressed stays separable from what the book says - and undoing it is exact rather than approximate. Source trust scales it: the same claim from an upperclassman counts half what it counts from the professor.</p>
+  </div>
+
+  <h3>The whiteboard is evidence, not a photo</h3>
+  <p>A brain dump is a retrieval attempt she has already performed. So when she asks the app to read one, the valuable half of the answer is not what she remembered - it is what a complete answer would contain that is <strong>absent</strong>. The analysis is told not to invent errors, and to say plainly when handwriting is illegible rather than guess: a confident misreading of her own notes is worse than an admission.</p>
+
+  <h3>Plans that admit what they cannot do</h3>
+  <div class="formula"><span class="c"># computed, never generated</span>
+capacity   = study_days x minutes_per_day / <span class="k">1.0 min per question</span>
+priority   = weakness x exam_weight x forgettingRisk x (1.25 if never practised)
+questions  = 6 if weak · 4 if developing · 3 · 2 · 1 if solid
+
+<span class="c"># two honesty rules, both enforced by tests</span>
+- never schedules more minutes than she said she has
+- when capacity runs out, it NAMES what it dropped</div>
+  <p>A third warning fires in the opposite direction: when a plan uses less than half the time she set aside, it says so and explains that the shortfall is unmapped material rather than a scheduling error. Days are dealt round-robin so topics interleave, the weakest third gets a second pass at least two days later, and the final day is consolidation only.</p>
+  <p class="note">Readiness is deliberately not a predicted score. There is no validation data behind this app, so a forecast would be invented precision. It reports weighted coverage, states how many mapped concepts have never been practised, and carries that caveat in its own payload so no screen can quietly drop it.</p>
+</section>
+
+<!-- ============================================================ 4X -->
+<section id="scopedrills">
+  <h2><span class="num">4</span><span>Scope &amp; drills</span></h2>
+  <p class="lede">Telling the engine what it may serve, and four games aimed at the specific subtest pattern.</p>
+
+  <h3>Scope</h3>
+  <p>Practice drew from everything she had ever studied, so a finished Term&nbsp;3 exam competed with the block she is actually sitting. Filtering by term, course or exam makes that a choice rather than an assumption.</p>
+  <div class="callout">
+    <h3>Narrowing scope has a cost, and the UI says it</h3>
+    <p>Everything outside the filter stops being served for review — it does not stop decaying. That is the correct trade the week before a midterm and the wrong one afterwards, so <code>describe()</code> returns the consequence as text and the panel prints it rather than hiding it.</p>
+    <p>Two smaller calls: a concept sitting on both a finished exam and an upcoming one is <strong>not</strong> previous material — the upcoming exam wins. And an impossible filter serves nothing and explains why, because silently ignoring the filter is the far more dangerous failure.</p>
+  </div>
+
+  <h3>Drills, and what they honestly are</h3>
+  <p>Four games built from concepts already in her bank, so all of it runs with no API key. Each one traces to a specific number in the report:</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Drill</th><th>Comes from</th><th>Design call</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">Sequence</td><td>Visual span well above auditory span</td><td>Span adapts to sit at your edge, not at a target</td></tr>
+      <tr><td class="mono">Chunk It</td><td>AWMI-R 78 — a bare list of seven is unusable</td><td>Not graded for "correctness": many groupings are defensible, and marking one right teaches her to guess the app's answer</td></tr>
+      <tr><td class="mono">Odd One Out</td><td>Inhibition/Switching 10 — a strength</td><td>The rule flips every round; this is the one that should feel good</td></tr>
+      <tr><td class="mono">Name It</td><td>Naming slow — retrieval is slow, not absent</td><td>Never timed, near-misses accepted, cue on request</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout">
+    <h3>These do not fix a working-memory deficit</h3>
+    <p>Evidence that working-memory training transfers to real capacity is weak. The app states that on the drills tab rather than burying it, because a study tool that implies it can raise her span would be selling her something.</p>
+    <p>What the drills do have support for: practising in the channel that works, rehearsing compensations she can apply in a real exam, and building content fluency. Extended time and a low-distraction room remain the interventions that actually help most — and those are accommodations, not exercises.</p>
+  </div>
+
+  <p class="note">Drill results are written to their own table and never reach <code>attempt</code>. A drill is a skill exercise, not a knowledge test, and folding its scores into mastery would corrupt the model with a different task. Pace is compared only against her own earlier runs — the same rule that keeps <code>rt_ms</code> out of the mastery formula.</p>
+</section>
+
+<!-- ============================================================ 5X -->
+<section id="phase5">
+  <h2><span class="num">5</span><span>Application, notes, pressure</span></h2>
+  <p class="lede">It leaves the browser, it reads her notes, and it can put a clock on — carefully.</p>
+
+  <h3>A real application</h3>
+  <p>Start Menu and Desktop shortcuts launch it through <code>pythonw.exe</code>: no console, no browser tab, no URL. It takes a free port from the OS rather than fighting over one, and when packaged as an executable the database moves to <code>%LOCALAPPDATA%</code> — a frozen app's own folder is read-only and its extraction directory is temporary, which is the wrong place for the only copy of her study history. If no native webview is present it opens her browser and says so, rather than showing a blank window.</p>
+
+  <h3>Critiquing notes</h3>
+  <p>Measured offline, judged with Claude. The measurements — words per line, sentence length, longest unbroken list, whether a table exists at all — are arithmetic over her actual text, shown as numbers she can check. The critique quotes her own writing and rewrites one passage into the better shape, because a rewrite is usable and a principle is not.</p>
+
+  <div class="callout">
+    <h3>Two claims this refuses to make</h3>
+    <p><strong>"Write by hand instead of typing."</strong> The laptop-versus-longhand finding is repeated everywhere and has not replicated cleanly. Telling her to change her whole workflow on a contested result would be passing off a preference as evidence.</p>
+    <p><strong>"You're a visual learner."</strong> Learning styles have no support. The reason to route her visually is a measured ~1.5 SD gap between her own Symbol Span and her own auditory span — a fact about her, not a personality type. Both constraints are pinned by a test, not just by a prompt.</p>
+  </div>
+
+  <p>The framework is Dunlosky et al. (2013): practice testing and distributed practice rated <strong>high</strong> utility; elaborative interrogation, self-explanation and interleaving <strong>moderate</strong>; summarisation, highlighting and rereading <strong>low</strong>. Every flag names its basis, so "this list is longer than you can hold" and "rereading is low-utility" are visibly different kinds of claim. Quotes in the critique are verified against her text verbatim; an unverified one is marked in the UI rather than shown as fact.</p>
+
+  <h3>A timer that never cuts her off</h3>
+  <div class="formula"><span class="c"># presets</span>
+off (default) · double time 180s · time and a half 135s · standard NBME 90s
+
+<span class="c"># behaviour past the limit</span>
+bar turns amber · label reads "over the limit — keep going"
+nothing is graded · submit still offered · input still editable
+elapsed time is stored and <span class="k">never enters the mastery formula</span></div>
+  <p>She asked for exam pressure and this delivers it, but a hard cut-off would convert a formal accommodation into a stressor and defeat the purpose of practising at all. Going over is information. The clock counts up toward a limit rather than draining toward zero, for the same reason.</p>
+
+  <h3>Reading the vignette</h3>
+  <p>NBME stems are long on purpose and the question is at the bottom. The dissector splits a stem into <em>the ask</em>, lines that <em>narrow it</em> (who / when / numbers), <em>background</em>, and <em>skim</em> — on pattern matching alone, no API key — and flags negated stems loudly, since NOT/EXCEPT is the most common way to lose a question you knew.</p>
+  <p class="note">Classification is deliberately conservative: an uncertain line is called background, never skim. Telling her to ignore a line that mattered is a far worse error than leaving one unclassified, so the heuristic is tuned to under-call padding. The reading strategy itself is standard test-taking advice, and the playbook labels it as such rather than dressing it up as a research finding — what <em>is</em> evidence-backed is the reason it helps her specifically: it reduces how much has to be held at once.</p>
+</section>
+
+<!-- ============================================================ 6X -->
+<section id="phase6">
+  <h2><span class="num">6</span><span>Marking up the question</span></h2>
+  <p class="lede">Per-question, not per-app: coloured marks over the actual phrases, and advice conditional on what is in that stem.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Mark</th><th>What it means</th><th>Why it earns a colour</th></tr></thead>
+    <tbody>
+      <tr><td><strong>flips the question</strong></td><td>NOT / EXCEPT / LEAST</td><td>The most expensive misread there is — it wins every overlap</td></tr>
+      <tr><td><strong>number</strong></td><td>lab, vital, dose</td><td>At Digits Forward = 6, these are what has to go on paper</td></tr>
+      <tr><td><strong>timing</strong></td><td>onset, duration</td><td>Acute versus chronic usually decides the differential</td></tr>
+      <tr><td><strong>who</strong></td><td>age, sex</td><td>Narrows the answer before a single symptom is read</td></tr>
+      <tr><td><strong>finding</strong></td><td>what examination showed</td><td>Detected from lead-in phrasing, the only reliable offline route</td></tr>
+      <tr><td><strong>background</strong></td><td>history, meds, social</td><td>Real but rarely decisive</td></tr>
+      <tr><td><strong>skim</strong></td><td>setup phrasing</td><td>Struck through rather than hidden — she can still check it</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>The advice underneath is generated from the dissection, not chosen from a list. A stem with no numbers is told it is a pattern-recognition item; a stem with four is told to put them in a column. A lean stem is never lectured about padding it does not have, and a negated stem gets its warning before anything else.</p>
+
+  <div class="callout">
+    <h3>Two regexes that could never match</h3>
+    <p>A literal backspace character had been baked into the <code>finding</code> and <code>history</code> patterns, so both silently matched nothing and "Physical examination shows diaphoresis" was being marked as <em>skim</em> — advice to ignore the one line that carried the diagnosis. The patterns looked correct in the source; only <code>repr()</code> on the compiled pattern showed the <code></code>.</p>
+    <p>Alongside it, <code>158/94 mm Hg</code> was being marked as "94 mm" with the systolic left bare, and <code>37.0 C</code> not marked at all. Compound patterns now come first, so a blood pressure is one value rather than a fragment.</p>
+  </div>
+
+  <p class="note">The markup is checked by a test that reassembles the segments and compares them against the original line, so highlighting can never silently drop or duplicate her text — the failure mode that would be hardest to notice and worst to ship.</p>
+
+  <h3>Note check moved</h3>
+  <p>It was a top-level tab; it is now a collapsed section on Profile with three sources — paste, pick from the vault, or upload a document. Reading documents reuses the extractors the course-material pipeline already has, so a <code>.docx</code> of her notes is read the same way a <code>.docx</code> of a lecture is. A PDF with no text layer says it is probably a scan and points at the vault, rather than returning an empty review.</p>
+</section>
+
+<!-- ============================================================ AUDIT -->
+<section id="audit">
+  <h2><span class="num">✓</span><span>Audit &amp; data safety</span></h2>
+  <p class="lede">What was left after the plan: finding what was broken, and protecting the one thing that cannot be rebuilt.</p>
+
+  <h3>Cold start</h3>
+  <p>Every surface run against a completely empty database — the state a new user hits, and one that had never been tested end to end. All 26 GET endpoints returned 200, all 13 views rendered a real empty state, and the console stayed clean. Every destructive-path POST returned a usable message rather than a stack trace.</p>
+  <p class="note">Three of those messages were leaking Python internals. <code>str(KeyError("x"))</code> is <code>"'x'"</code> — quotes included — so the UI was showing <code>'no such exam: nope'</code>. The kind of thing that only turns up when you actually look.</p>
+
+  <h3>Backups</h3>
+  <p>The <code>attempt</code> table is the one thing here that cannot be regenerated. Questions can be rewritten, concepts re-extracted, mastery recomputed from history — but a year of answers is a year of answers, and it was sitting in a single SQLite file on one laptop with no way to get it out.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Decision</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Automatic on every start, last 10 kept</td><td>The backup she remembers to take is the one she doesn't need</td></tr>
+      <tr><td>SQLite's <code>.backup()</code>, not a file copy</td><td>Copying a database mid-write produces a file that looks fine and is corrupt</td></tr>
+      <tr><td>Restore snapshots the current data first</td><td>Undoing a restore has to be possible, or the button is a loaded gun</td></tr>
+      <tr><td>JSON export alongside the .db</td><td>A .db is only useful next to this app; her history should outlive it</td></tr>
+      <tr><td>Skipped if one was taken in the last 6 hours</td><td>A restart loop shouldn't churn through the ten slots</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="note">Building this surfaced a design smell worth fixing rather than routing around: <code>backup.py</code> was deriving the database path from <code>app.DATA</code> instead of asking <code>db</code>. Two sources for one fact is exactly how a backup ends up pointing at the wrong file, so <code>db.path()</code> is now the single answer and the test that caught it stayed.</p>
+</section>
+
+<!-- ============================================================ 08 -->
+<section id="a8">
+  <h2><span class="num">08</span><span>Phase plan</span></h2>
+  <p class="lede">Your eight phases, with one reordering I'd argue for - and one phase inserted since.</p>
+
+  <div class="callout">
+    <h3>Taxonomy moves from Phase 4 to Phase 1</h3>
+    <p>Mastery tracking is meaningless without stable concept identity, and concept identity needs a topic tree to hang from. If Phase 1 ships session-scoped IDs, every attempt recorded in Phases 1–3 is orphaned when the taxonomy lands — the history you most want to keep is the history that gets thrown away. Seeding the taxonomy first costs a day; retrofitting it costs the data.</p>
+  </div>
+
+  <div class="phase">
+    <span class="pn">01</span>
+    <div>
+      <h3>Foundation<span class="pill">shipped</span></h3>
+      <p>SQLite schema, migrations, models. Topic tree + stable concept slugs. Question bank. Append-only attempts. Baseline mastery math with unit tests. Existing generator writes into the bank instead of into memory.</p>
+      <p class="ships">ships · durable concepts · queryable history · mastery v1</p>
+    </div>
+  </div>
+  <div class="phase"><span class="pn">02</span><div><h3>Weakness targeting<span class="pill">shipped</span></h3><p>Priority scoring, softmax selection, variant rotation, cooldown. The heatmap with drill-down. Session modes as quota reweights.</p><p class="ships">ships · adaptive selection · mastery map</p></div></div>
+  <div class="phase"><span class="pn">03</span><div><h3>Her own layer<span class="pill">shipped</span></h3><p>Terms, courses and exams as a second axis. A vault for whiteboard photos and exam questions. A pinboard she controls. Instructor emphasis captured as evidence, with a conversation over it. Time-boxed study plans.</p><p class="ships">ships · organisation · vault · pinboard · exam intel · study plans</p></div></div>
+  <div class="phase"><span class="pn">3b</span><div><h3>Spaced repetition &amp; decay<span class="pill">shipped</span></h3><p>SM-2 already runs on every attempt and feeds the stability term; retention and the three-number display landed in Phase 1. What remains is surfacing the review queue as its own screen.</p><p class="ships">remaining · review queue UI</p></div></div>
+  <div class="phase"><span class="pn">04</span><div><h3>Source ingestion<span class="pill">shipped</span></h3><p>Chunked First Aid pipeline, high-yield scoring, concept-to-source mapping, high-yield weaknesses view.</p><p class="ships">ships · the highest-value screen in the app</p></div></div>
+  <div class="phase"><span class="pn">05</span><div><h3>Anki export<span class="pill">shipped</span></h3><p>Card synthesis from weak concepts — basic, cloze, clinical. Preview and edit before export. TSV with your field schema.</p><p class="ships">ships · red/orange → deck</p></div></div>
+  <div class="phase"><span class="pn">06</span><div><h3>Progression<span class="pill">shipped</span></h3><p>XP, levels, streaks, quests, achievements, organ-system map, boss challenges. Built to the constraints in the conflict section.</p><p class="ships">ships · the game layer</p></div></div>
+  <div class="phase"><span class="pn">07</span><div><h3>Learning analytics<span class="pill">shipped</span></h3><p>Format-performance comparison, method-retention effects, error-type patterns. Every insight gated on sample size and effect size before it surfaces.</p><p class="ships">ships · "you retain pharm 18% better after…" — only when true</p></div></div>
+  <div class="phase"><span class="pn">08</span><div><h3>Polish<span class="pill">shipped</span></h3><p>Transition timing, animation, edge cases, performance on a large bank, accessibility pass.</p><p class="ships">ships · the feel</p></div></div>
+
+  <p style="margin-top:26px"><strong>All eight phases are shipped</strong>, plus two inserted along the way (her own layer, and scope &amp; drills). 313 checks across seven suites, all passing. The one thing still unproven is anything that calls Claude — there has never been an API key on the machine this was built on, so generation, the note critique, the exam chat, textbook extraction and Claude-written Anki cards have been built and tested to their boundaries but never run end to end.</p>
+</section>
+
+</main>
+</div>

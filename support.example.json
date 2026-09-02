@@ -1,0 +1,32 @@
+{
+  "name": "Your Name",
+  "paypal_url": "",
+  "cryptocom_url": "",
+  "wallets": [
+    {
+      "chain": "Bitcoin",
+      "symbol": "BTC",
+      "uri": "bitcoin",
+      "address": ""
+    },
+    {
+      "chain": "Ethereum",
+      "symbol": "ETH",
+      "uri": "ethereum",
+      "address": ""
+    },
+    {
+      "chain": "Solana",
+      "symbol": "SOL",
+      "uri": "solana",
+      "address": ""
+    },
+    {
+      "chain": "XRP",
+      "symbol": "XRP",
+      "uri": "ripple",
+      "address": "",
+      "tag": ""
+    }
+  ]
+}

@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learnometry</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/logo.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <img class="mark" src="/logo.png" alt="" width="34" height="34">
+    <div>
+      <h1>Learnometry</h1>
+      <p class="tag">Study routed through the channel that works.</p>
+    </div>
+  </div>
+  <nav class="dests" id="dests" aria-label="Main"></nav>
+  <div class="whoami" id="whoami">
+    <div class="status" id="status" title="API connection"><span class="dot"></span><span id="statusText">checking…</span></div>
+    <button class="userchip" id="userChip" aria-haspopup="true">
+      <span class="avatar" id="userAvatar"></span>
+      <span class="uname" id="userName">—</span>
+      <span class="caret">▾</span>
+    </button>
+    <div class="usermenu" id="userMenu" hidden></div>
+  </div>
+</header>
+
+<div class="subbar" id="subbar" hidden>
+  <nav class="subnav" id="subnav" aria-label="Section"></nav>
+</div>
+
+<main>
+
+<div class="pagehead" id="pageHead" hidden>
+  <div class="phrow">
+    <h2 id="phTitle"></h2>
+    <button class="phinfo" id="phInfo" hidden
+            aria-label="About this page" title="About this page">i</button>
+    <div class="phactions" id="phActions"></div>
+  </div>
+  <p class="phsub" id="phSub" hidden></p>
+  <div class="phdetail" id="phDetail" hidden></div>
+</div>
+
+
+<!-- ============================== TODAY ============================= -->
+<section class="view active" id="view-today">
+  <div class="dash" id="dash">
+    <div class="dashmain">
+      <div class="card hero">
+        <div class="herotop">
+          <div>
+            <p class="eyebrow" id="dashGreeting">Today</p>
+            <h2 id="dashHeadline">Loading…</h2>
+            <p class="subject" id="dashSub"></p>
+          </div>
+          <div class="levelbadge" id="dashLevel"></div>
+        </div>
+        <div class="goalbar"><span class="goalfill" id="dashGoalFill"></span></div>
+        <p class="hint" id="dashGoalText"></p>
+        <button class="btn primary big" id="dashStart">Continue studying</button>
+        <p class="hint" id="dashPlanNote"></p>
+      </div>
+
+      <div class="card" id="dashWeakCard">
+        <div class="cardhead">
+          <h3>Needs attention</h3>
+          <button class="btn ghost small" data-view="weak">View all</button>
+        </div>
+        <div id="dashWeak" class="weaklist"></div>
+      </div>
+    </div>
+
+    <div class="dashside">
+      <div class="card statcard">
+        <div class="statrow" id="dashStats"></div>
+      </div>
+      <div class="card" id="dashDueCard">
+        <h4>Due for review</h4>
+        <div class="bignum" id="dashDue">—</div>
+        <p class="hint" id="dashDueNote"></p>
+        <button class="btn small" id="dashReview">Review those</button>
+      </div>
+      <div class="card" id="dashExamCard" hidden>
+        <h4>Next exam</h4>
+        <div id="dashExam"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ MATERIAL ============================ -->
+<section class="view" id="view-material">
+
+  <!-- ------------------------------ toolbar ------------------------------ -->
+  <div class="libbar">
+    <div class="searchwrap">
+      <input type="search" id="libSearch" autocomplete="off" spellcheck="false"
+             placeholder="Search files, concepts and questions…">
+      <div class="searchdrop" id="libSearchDrop" hidden></div>
+    </div>
+    <button class="btn primary" id="addMaterialBtn">+ Add material</button>
+  </div>
+
+  <div class="filtbar" id="libFilters">
+    <select class="filt" id="libTerm" aria-label="Term"></select>
+    <select class="filt" id="libExam" aria-label="Exam"></select>
+    <select class="filt" id="libKind" aria-label="Type"></select>
+    <select class="filt" id="libStatus" aria-label="Status"></select>
+    <span class="filtspace"></span>
+    <select class="filt" id="libSort" aria-label="Sort by"></select>
+    <button class="btn ghost small" id="libClear" hidden>Clear filters</button>
+  </div>
+
+  <div id="libPresets" class="libnag"></div>
+
+  <!-- --------------------------- bulk actions ---------------------------- -->
+  <div class="bulkbar" id="libBulk" hidden>
+    <b id="libBulkCount"></b>
+    <select id="bulkExam" aria-label="Assign to exam"></select>
+    <select id="bulkKind" aria-label="Set type"></select>
+    <button class="btn small ghost" id="bulkTag">Tag…</button>
+    <button class="btn small ghost danger" id="bulkDelete">Delete</button>
+    <button class="btn small ghost" id="bulkClear">Clear</button>
+  </div>
+
+  <!-- ------------------------------- table ------------------------------- -->
+  <div class="tablewrap">
+    <table class="dtable" id="libTable">
+      <thead>
+        <tr>
+          <th class="tcheck"><input type="checkbox" id="libAll" aria-label="Select every file on this page"></th>
+          <th class="tname sortable" data-sort="name">Name</th>
+          <th class="thide-s">Exam</th>
+          <th class="cnum sortable thide-s" data-sort="concepts">Concepts</th>
+          <th class="cnum sortable" data-sort="questions">Questions</th>
+          <th class="tstatus">Status</th>
+          <th class="cnum sortable thide-m" data-sort="added">Added</th>
+          <th class="tmenu"></th>
+        </tr>
+      </thead>
+      <tbody id="libBody"></tbody>
+    </table>
+  </div>
+
+  <div class="libfoot">
+    <span class="hint" id="libCount"></span>
+    <div class="pager" id="libPager"></div>
+  </div>
+
+  <div class="emptystate" id="libEmpty" hidden>
+    <p class="esbig">Nothing here yet</p>
+    <p class="hint">Add your lectures, slides and notes and the rest of the app
+      has something to work from.</p>
+    <button class="btn primary" id="emptyAdd">+ Add material</button>
+  </div>
+
+  <div id="prereadOut"></div>
+
+  <!-- --------------------------- file detail ----------------------------- -->
+  <aside class="drawer" id="libDrawer" hidden aria-label="File detail">
+    <div class="drawerhead">
+      <div>
+        <h3 id="dwName"></h3>
+        <p class="hint" id="dwMeta"></p>
+      </div>
+      <button class="wclose" id="dwClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="drawerbody" id="dwBody"></div>
+  </aside>
+  <div class="scrim" id="libScrim" hidden></div>
+
+  <!-- --------------------------- add material ---------------------------- -->
+  <div class="sheet" id="addSheet" hidden aria-label="Add material">
+    <div class="sheetcard">
+      <div class="sheethead">
+        <h3>Add to Learnometry</h3>
+        <button class="wclose" id="addClose" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="sheetbody">
+        <div class="drop" id="drop">
+    <div class="drop-inner">
+      <div class="drop-icon">＋</div>
+      <p class="drop-title">Drop your course files here</p>
+      <p class="drop-sub">PDF · DOCX · PPTX · TXT · MD · images — or click to pick</p>
+      <input type="file" id="fileInput" multiple hidden>
+    </div>
+  </div>
+
+        <div id="fileList" class="filelist"></div>
+
+        <div class="row" id="analyzeRow" hidden>
+          <button class="btn primary" id="analyzeBtn">Read the material</button>
+          <span class="hint">Claude reads it once, then everything else is fast.</span>
+        </div>
+
+        <div class="card">
+    <details id="importPanel">
+      <summary class="bigsummary">Paste questions from a chat
+        <span class="sublabel">no API call — this is free</span>
+      </summary>
+      <p class="why">Write the questions anywhere — a separate Claude chat works well — then paste the JSON here. It is checked against the same rules the app applies to everything else, and nothing is saved unless every check passes.</p>
+      <div class="row">
+        <button class="btn ghost small" id="impCopySpec">Copy the format spec</button>
+        <span class="hint">Paste that into the other chat first so it knows the shape to produce.</span>
+      </div>
+      <textarea id="impJson" rows="10" placeholder='{ "analysis": { ... }, "questions": [ ... ] }'></textarea>
+      <div class="row">
+        <button class="btn" id="impCheck">Check it</button>
+        <button class="btn primary" id="impSave" disabled>Save to bank</button>
+      </div>
+      <div id="impResult"></div>
+    </details>
+  </div>
+
+        <div class="card">
+    <details id="bookPanel">
+      <summary class="bigsummary">Ingest a textbook
+        <span class="sublabel">index First Aid without uploading it</span>
+      </summary>
+      <p class="why">The book is segmented on this machine and never leaves it. What gets stored is concept names, where they sit, and which pages of <em>your</em> copy to look at — never the book's text.</p>
+      <div class="row">
+        <input type="text" id="bookPath" placeholder="Full path to the PDF…">
+        <button class="btn primary" id="bookScan">Scan</button>
+      </div>
+      <p class="hint" id="bookHint">Scanning walks every page and takes a minute or two. It needs no API key.</p>
+      <div id="bookResult" hidden>
+        <div class="planhead" id="bookStats"></div>
+        <div class="row">
+          <button class="btn primary" id="bookIngest">Extract concepts from mapped sections</button>
+          <span class="hint" id="bookIngestNote"></span>
+        </div>
+        <div class="progress" id="bookProgress" hidden><div class="bar" id="bookBar"></div></div>
+        <div id="bookSections" class="runlist"></div>
+      </div>
+    </details>
+  </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Files still going in. Uploading must never block the rest of the app. -->
+  <div class="upqueue" id="upQueue" hidden>
+    <div class="uqhead"><b>Adding files</b>
+      <button class="wclose" id="uqClose" aria-label="Hide">&times;</button></div>
+    <div id="uqList"></div>
+  </div>
+
+  <div id="analysis" hidden>
+    <div class="card">
+      <h2 id="anTitle"></h2>
+      <p class="subject" id="anSubject"></p>
+      <div class="overview" id="anOverview"></div>
+    </div>
+
+    <div class="card">
+      <h3>The whole topic on one screen</h3>
+      <p class="why" id="whyTable">The whole topic on one screen, so nothing has to be held in your head while you read the rest.</p>
+      <div class="md" id="anTable"></div>
+    </div>
+
+    <div class="card" id="flagCard" hidden>
+      <h3>Flags in the material</h3>
+      <ul id="anFlags" class="flags"></ul>
+    </div>
+
+    <div class="card">
+      <h3>How many questions this material needs</h3>
+      <div class="countbox">
+        <div class="countnum" id="countTotal">—</div>
+        <div class="countwhy">
+          <p id="countBreakdown" class="mono"></p>
+          <p id="countRationale"></p>
+        </div>
+      </div>
+      <label class="override">
+        Use a different number
+        <input type="number" id="countOverride" min="1" max="200">
+      </label>
+      <div class="row">
+        <button class="btn primary" id="genBtn">Build the question set</button>
+        <span class="hint" id="genHint"></span>
+      </div>
+      <div class="progress" id="genProgress" hidden><div class="bar" id="genBar"></div></div>
+    </div>
+
+    <div class="card">
+      <h3>Concepts found <span class="pill" id="conceptCount"></span></h3>
+      <div id="conceptList" class="concepts"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== QUIZ ============================== -->
+<section class="view" id="view-quiz">
+  <div class="empty" id="quizEmpty">
+    <div class="launcher" id="launcher">
+
+      <!-- The one-click path. The engine picks a mode that already exists and
+           says which and why, so the recommendation stays inspectable. -->
+      <div class="reccard" id="recCard">
+        <div class="recmain">
+          <p class="eyebrow">Recommended</p>
+          <h3 id="recTitle">Working out what you need…</h3>
+          <p class="hint" id="recWhy"></p>
+        </div>
+        <div class="recgo">
+          <div class="lengths small" id="recLengths"></div>
+          <button class="btn primary big" id="recStart">Start</button>
+        </div>
+      </div>
+
+      <details class="lopts" id="loptsPanel">
+        <summary class="loptsum">Choose it yourself</summary>
+
+        <div class="lgroup">
+          <h5>How long</h5>
+          <div class="lengths" id="lengths">
+        <button class="len" data-n="5">5</button>
+        <button class="len active" data-n="10">10</button>
+        <button class="len" data-n="20">20</button>
+        <button class="len" data-n="40">Endless</button>
+      </div>
+        </div>
+
+        <div class="lgroup">
+          <h5>Focus</h5>
+          <div class="modes" id="modes">
+        <button class="mode active" data-mode="mixed">
+          <b>Mixed review</b><span>A balanced draw across everything</span></button>
+        <button class="mode" data-mode="weak_areas">
+          <b>Weak areas</b><span>Mostly red and orange concepts</span></button>
+        <button class="mode" data-mode="high_yield">
+          <b>High yield</b><span>What's worth the most on the exam</span></button>
+        <button class="mode" data-mode="spaced">
+          <b>Due for review</b><span><span id="dueCount">—</span> concepts scheduled</span></button>
+        <button class="mode" data-mode="exam_cram">
+          <b>Exam cram</b><span>Weighted toward an upcoming exam</span></button>
+        <button class="mode" data-mode="new_material">
+          <b>New material</b><span>Concepts you haven't seen yet</span></button>
+      </div>
+        </div>
+
+        <details class="advanced" id="advPanel">
+          <summary>Source, scope and timing</summary>
+          <div class="scopebox">
+        <button class="scopetoggle" id="scopeToggle">
+          <span>Drawing from: <b id="scopeSummary">everything you've studied</b></span>
+          <span class="caret">▾</span>
+        </button>
+        <div class="scopepanel" id="scopePanel" hidden>
+          <p class="why">Pick what the engine is allowed to serve. Useful when
+            an old term's material keeps surfacing during a block you're actually
+            sitting.</p>
+          <div class="presetrow" id="scopePresets"></div>
+          <label class="inline"><span>Term</span><select id="scopeTerm"></select></label>
+          <label class="inline"><span>Course</span><select id="scopeCourse"></select></label>
+          <label class="inline"><span>Exam</span><select id="scopeExam"></select></label>
+          <div class="matpick">
+            <span class="matlabel">Or hone in on specific material</span>
+            <div id="scopeMaterial" class="matlist"></div>
+          </div>
+          <label class="checkline">
+            <input type="checkbox" id="scopeExcludePast">
+            <span>Skip material only from exams already sat</span>
+          </label>
+          <label class="checkline">
+            <input type="checkbox" id="scopeUnmapped" checked>
+            <span>Include material not attached to any exam</span>
+          </label>
+          <p class="scopecount" id="scopeCount"></p>
+          <p class="scopewarn" id="scopeWarn" hidden></p>
+          <button class="btn ghost small" id="scopeReset">Reset to everything</button>
+        </div>
+      </div>
+          <div class="scopebox">
+        <button class="scopetoggle" id="timerToggle">
+          <span>Timer: <b id="timerSummary">off</b></span>
+          <span class="caret">▾</span>
+        </button>
+        <div class="scopepanel" id="timerPanel" hidden>
+          <p class="why">Off by default. Extended time is a formal accommodation —
+            untimed is your normal working condition, not a concession.</p>
+          <div id="timerOptions" class="timeropts"></div>
+          <p class="scopecount" id="timerNote"></p>
+        </div>
+      </div>
+        </details>
+
+        <button class="btn primary big" id="startAdaptive">Start studying</button>
+        <p class="hint" id="poolHint"></p>
+      </details>
+    </div>
+
+    <div id="savedList" class="saved"></div>
+  </div>
+
+  <div id="quizRunner" hidden>
+    <div class="qbar">
+      <div class="qprogress"><div class="qbar-fill" id="qFill"></div></div>
+      <div class="qmeta">
+        <span id="qCounter"></span>
+        <span class="sep">·</span>
+        <span id="qType" class="qtype"></span>
+        <span class="sep">·</span>
+        <span id="qConcept" class="qconcept"></span>
+      </div>
+      <button class="btn ghost small" id="quitBtn">End &amp; review</button>
+    </div>
+
+    <!-- The instruction line stays on screen. It is never something to remember. -->
+    <p class="instruction" id="qInstruction"></p>
+
+    <div class="timerbar" id="timerBar" hidden>
+      <span class="tclock" id="tClock">0:00</span>
+      <span class="ttrack"><span class="tfill" id="tFill"></span></span>
+      <span class="tlimit" id="tLimit"></span>
+    </div>
+
+    <div class="qcard">
+      <div class="stem" id="qStem"></div>
+      <div class="md premise" id="qPremise" hidden></div>
+
+      <div id="qOptions" class="options"></div>
+
+      <div id="qTyped" class="typed" hidden>
+        <input type="text" id="qInput" placeholder="Type your answer…" autocomplete="off" spellcheck="false">
+        <p class="typedhint">Spelling and synonyms are fine. Word-finding speed is not what's being tested.</p>
+      </div>
+
+      <div class="ladder">
+        <button class="btn ghost small" id="cueBtn">Need a cue?</button>
+        <button class="btn ghost small" id="dissectBtn">Break down the question</button>
+        <div class="cue" id="qCue" hidden></div>
+        <div class="dissect" id="qDissect" hidden></div>
+      </div>
+
+      <div class="row submitrow">
+        <button class="btn primary" id="submitBtn">Check</button>
+        <button class="btn ghost" id="skipBtn">Skip</button>
+        <!-- Captured before feedback. After feedback, "I knew it" would just be
+             hindsight, and the confidently-wrong signal would vanish. -->
+        <span class="keyhint" id="keyHint"></span>
+        <div class="confidence" id="confidence">
+          <span class="clabel">How sure?</span>
+          <button class="chip" data-conf="knew">Knew it</button>
+          <button class="chip active" data-conf="unsure">Unsure</button>
+          <button class="chip" data-conf="guessed">Guessed</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="explain" id="qExplain" hidden>
+      <div class="verdict" id="qVerdict"></div>
+      <div class="momentum" id="qMomentum" hidden></div>
+
+      <div class="ecard">
+        <h4>Why</h4>
+        <div id="eWhy"></div>
+      </div>
+
+      <div class="ecard">
+        <h4>The picture</h4>
+        <div class="md" id="eVisual"></div>
+      </div>
+
+      <div class="ecard">
+        <h4>Rebuild it from here</h4>
+        <div id="eDerive"></div>
+      </div>
+
+      <div class="ecard">
+        <h4>Key clue</h4>
+        <div id="eClue"></div>
+      </div>
+
+      <div class="ecard hook">
+        <h4>Hook</h4>
+        <div id="eHook"></div>
+      </div>
+
+      <details class="ecard">
+        <summary>Every other option, and why it's wrong</summary>
+        <div id="eOptions"></div>
+      </details>
+
+      <p class="srcref" id="eSource"></p>
+      <div id="eWhereTo"></div>
+
+      <button class="btn primary wide" id="nextBtn">Next question</button>
+    </div>
+  </div>
+
+  <div id="quizDone" hidden>
+    <div class="card scorecard">
+      <h2>Session done</h2>
+      <div class="scorerow">
+        <div class="scorebox"><div class="big" id="scoreKnew">—</div><div>knew it</div></div>
+        <div class="scorebox"><div class="big" id="scoreWord">—</div><div>knew it, needed the word</div></div>
+        <div class="scorebox"><div class="big" id="scoreMissed">—</div><div>didn't know it</div></div>
+      </div>
+      <p class="why">Those three are counted separately on purpose. A single percentage would blur "couldn't retrieve the word fast" together with "doesn't know the material", and for this profile that's the difference between a real gap and a measurement artifact.</p>
+      <div class="moves" id="sessionMoves" hidden></div>
+      <div class="row">
+        <button class="btn primary" id="reviewBtn">What should I do next?</button>
+        <button class="btn ghost" id="saveBtn">Save this session</button>
+        <button class="btn ghost" id="retryBtn">Redo the ones I missed</button>
+        <button class="btn ghost" id="newSessionBtn">Pick a different set</button>
+      </div>
+    </div>
+    <div class="card" id="reviewCard" hidden>
+      <h3 id="revVerdict"></h3>
+      <div id="revPatterns"></div>
+      <h4>Repair plan</h4>
+      <div class="md" id="revTable"></div>
+      <h4>Next session</h4>
+      <p id="revNext"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== MASTERY / OVERVIEW ==================== -->
+<section class="view" id="view-map">
+  <div class="card legendcard">
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="mgrid">
+    <div class="card">
+      <div class="cardhead">
+        <h3>Systems</h3>
+        <span class="hint" id="mapCoverage"></span>
+      </div>
+      <div id="heatmap" class="heatmap"></div>
+    </div>
+
+    <div class="card">
+      <div class="cardhead">
+        <h3>Needs attention</h3>
+        <button class="btn ghost small" data-view="weak">See all</button>
+      </div>
+      <div id="mapWeak" class="weaklist"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== MASTERY / TOPICS ====================== -->
+<section class="view" id="view-topics">
+  <div class="card">
+    <div class="cardhead">
+      <h3>Every topic</h3>
+      <input type="search" id="topicFilter" class="inlinesearch"
+             placeholder="Filter topics and concepts…" autocomplete="off">
+    </div>
+    <div id="topicTree" class="topictree"></div>
+  </div>
+
+  <div class="card" id="conceptDetail" hidden>
+    <h3 id="cdName"></h3>
+    <p class="subject" id="cdTopic"></p>
+    <div class="threenums" id="cdNums"></div>
+    <div id="cdExtra"></div>
+  </div>
+</section>
+
+<!-- ======================== MASTERY / WEAKNESSES ==================== -->
+<section class="view" id="view-weak">
+  <div class="card">
+    <div class="cardhead">
+      <h3>Ranked by what it costs you</h3>
+      <span class="hint">weakness &times; yield &times; forgetting risk</span>
+    </div>
+    <div id="weakList" class="weaklist"></div>
+  </div>
+
+  <div class="card">
+    <details id="ankiPanel">
+      <summary class="bigsummary">Export to Anki
+        <span class="sublabel">turn weak concepts into active-recall cards</span>
+      </summary>
+      <p class="why">Not a dump of your question bank — a multiple-choice item makes a bad flashcard, because the options do the remembering for you. What goes across is the concept, rewritten as a recall prompt.</p>
+      <div id="ankiSelections" class="ankisel"></div>
+      <div class="row">
+        <label class="inline">Cards<input type="number" id="ankiLimit" value="40" min="5" max="200" step="5"></label>
+        <label class="checkline" style="margin:0">
+          <input type="checkbox" id="ankiClaude" checked>
+          <span>Write the cards with Claude (off = plain cards from your bank)</span>
+        </label>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="ankiBuild">Build the deck</button>
+        <button class="btn" id="ankiDownload" hidden>Download .tsv</button>
+      </div>
+      <p class="hint" id="ankiNote"></p>
+      <div id="ankiPreview"></div>
+    </details>
+  </div>
+
+</section>
+
+<!-- ============================= PROGRESS =========================== -->
+<section class="view" id="view-progress">
+  <div class="card">
+    <div class="levelwide" id="progLevel"></div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead">
+      <h3>Regions</h3>
+      <button class="btn ghost small" data-view="map">Open the mastery map</button>
+    </div>
+    <div id="territories" class="territories"></div>
+  </div>
+
+  <div class="card">
+    <h3>Achievements</h3>
+    <div id="achievements" class="achgrid"></div>
+  </div>
+</section>
+
+<!-- ============================ ANALYTICS =========================== -->
+<section class="view" id="view-analytics">
+  <div class="card" id="anInsightCard">
+    <h3>What the data says</h3>
+    <div id="anInsights"></div>
+  </div>
+  <div class="card">
+    <h3>Your confidence</h3>
+    <div id="anCalibration"></div>
+  </div>
+  <div class="card">
+    <h3>Cues</h3>
+    <div id="anCues"></div>
+  </div>
+  <div class="card">
+    <div class="cardhead">
+      <h3>Still watching</h3>
+      <span class="hint">not enough evidence yet</span>
+    </div>
+    <div id="anPending"></div>
+  </div>
+  <div class="card">
+    <details id="anMethodPanel">
+      <summary class="bigsummary">How Learnometry decides this
+        <span class="sublabel">the test, the thresholds, and why most panels stay empty</span>
+      </summary>
+      <p class="honesty" id="anMethod"></p>
+      <p class="why">Nothing appears above until it clears that bar. An empty
+        panel is the system working: with a handful of answers, any claim it
+        made would be noise wearing a percentage.</p>
+    </details>
+  </div>
+</section>
+
+
+<!-- ============================== HELP ============================== -->
+<section class="view" id="view-help">
+  <div class="card">
+    <h3>Getting started</h3>
+    <div id="helpSteps" class="steps"></div>
+  </div>
+
+  <div class="card">
+    <details id="evalPanel">
+      <summary class="bigsummary">Getting properly assessed
+        <span class="sublabel">real evaluations, and what to skip</span>
+      </summary>
+      <div id="evalBody"></div>
+    </details>
+  </div>
+
+  <div class="card" id="supportCard">
+    <div class="cardhead">
+      <h3>Support this project</h3>
+      <span class="hint" id="supportName"></span>
+    </div>
+    <p class="why">Learnometry is free and always will be. If it has been useful and you'd like to say thank you, here are the ways.</p>
+    <div id="supportLinks" class="paylinks"></div>
+    <div id="supportWallets" class="walletgrid"></div>
+    <p class="hint" id="supportEmpty" hidden>Nothing is configured on this
+      install. Copy <code>support.example.json</code> to
+      <code>data/support.json</code> and fill in whichever addresses you want to
+      offer &mdash; each one is checksum-checked before it is ever displayed, and
+      anything that fails is reported rather than shown.</p>
+    <div id="supportWarn"></div>
+  </div>
+</section>
+
+<!-- ========================= FIRST-RUN WELCOME ====================== -->
+<div class="welcome" id="welcome" hidden>
+  <div class="welcomebox">
+    <button class="wclose" id="welcomeClose" aria-label="Close">&times;</button>
+    <img src="/logo.png" alt="" class="wlogo">
+    <h2>Welcome to Learnometry</h2>
+    <p class="wsub">Study routed through the channel that works.</p>
+    <div id="welcomeSteps" class="steps"></div>
+    <div class="row wrow">
+      <button class="btn primary" id="welcomeStart">Get started</button>
+      <button class="btn ghost" id="welcomeDonate">Support the project</button>
+    </div>
+    <p class="hint wfoot">You can reopen this any time from your account menu, under <b>Help &amp; support</b>.</p>
+  </div>
+</div>
+
+<!-- ============================= SCREENER =========================== -->
+<section class="view" id="view-screener">
+  <div class="card" id="scrIntro">
+    <p class="why" id="scrDisclaimer"></p>
+    <div id="scrTasks" class="drillgrid"></div>
+    <div class="row">
+      <button class="btn primary" id="scrStart">Start</button>
+      <button class="btn ghost" id="scrSkip">Not now</button>
+    </div>
+  </div>
+
+  <div class="card" id="scrStage" hidden>
+    <div class="cardhead">
+      <h3 id="scrName"></h3>
+      <button class="btn ghost small" id="scrQuit">Stop</button>
+    </div>
+    <p class="instruction" id="scrHow"></p>
+    <div id="scrBody"></div>
+    <div id="scrFeedback"></div>
+  </div>
+
+  <div class="card" id="scrResult" hidden>
+    <h3>What this suggests</h3>
+    <div id="scrProfile"></div>
+    <div class="row">
+      <button class="btn primary" id="scrApply">Use this profile</button>
+      <button class="btn ghost" id="scrRedo">Run it again</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== DRILLS ============================ -->
+<section class="view" id="view-drills">
+  <div class="card">
+    <p class="honesty" id="drillHonesty"></p>
+  </div>
+
+  <div id="drillPicker" class="drillgrid"></div>
+
+  <div class="card" id="drillStage" hidden>
+    <div class="cardhead">
+      <h3 id="dsName"></h3>
+      <button class="btn ghost small" id="dsQuit">End drill</button>
+    </div>
+    <p class="instruction" id="dsInstruction"></p>
+    <div id="dsBody"></div>
+    <div id="dsFeedback"></div>
+  </div>
+
+  <div class="card" id="drillHistory" hidden>
+    <h3>Your runs</h3>
+    <div id="dhBody"></div>
+  </div>
+</section>
+
+<!-- ========================== EXAMS & PLAN ========================== -->
+<section class="view" id="view-plan">
+ <div class="plangrid">
+
+  <div class="planrail">
+    <div class="card">
+      <div class="cardhead">
+        <h3>Exams</h3>
+        <button class="btn small" id="newExamBtn">Add</button>
+      </div>
+      <div id="examList" class="examlist"></div>
+    </div>
+
+    <div class="card">
+      <div class="cardhead">
+        <h3>Terms &amp; courses</h3>
+        <button class="btn small" id="newTermBtn">New term</button>
+      </div>
+      <div id="termList" class="termlist"></div>
+    </div>
+  </div>
+
+  <div class="planmain">
+  <div class="card" id="planEmpty" hidden>
+    <p class="esbig">No exams yet</p>
+    <p class="hint">Add the date of your next paper and this page becomes a
+      countdown, a readiness estimate and a list of what to fix first.</p>
+    <button class="btn primary" id="planAddExam">Add an exam</button>
+  </div>
+
+  <div class="card" id="examDetail" hidden>
+    <div class="cardhead">
+      <h3 id="edName"></h3>
+      <span class="countdown" id="edCountdown"></span>
+    </div>
+    <p class="subject" id="edMeta"></p>
+
+    <div class="row nomargin edacts">
+      <button class="btn primary" id="edStudy">Build today's session</button>
+      <span class="hint">Practice, scoped to what this paper covers.</span>
+    </div>
+
+    <div class="readiness" id="edReadiness"></div>
+
+    <h4>Covers</h4>
+    <div class="row">
+      <input type="text" id="edTopicSearch" placeholder="Add a topic or concept to this exam…">
+    </div>
+    <div id="edSuggest" class="suggest" hidden></div>
+    <div id="edCovers" class="chips"></div>
+
+    <h4>What you were told</h4>
+    <p class="why">Instructor emphasis. Each note can raise a concept's priority — but only after you confirm it, so a misheard remark can't quietly distort a month of studying.</p>
+    <div class="row emphrow">
+      <input type="text" id="emphText" placeholder="e.g. Dr. Nassar said acid-base is heavily tested">
+      <select id="emphWho"></select>
+      <select id="emphStrength"></select>
+      <button class="btn" id="emphAdd">Save</button>
+    </div>
+    <div id="emphList" class="emphlist"></div>
+
+    <h4>Talk it through</h4>
+    <div id="chatBox" class="chatbox">
+      <div id="chatLog" class="chatlog"></div>
+      <div class="row">
+        <input type="text" id="chatInput" placeholder="What should I focus on tonight?">
+        <button class="btn primary" id="chatSend">Send</button>
+      </div>
+    </div>
+
+    <h4>Study plan</h4>
+    <div class="row">
+      <label class="inline">Minutes a day
+        <input type="number" id="planMinutes" value="60" min="5" max="480" step="5">
+      </label>
+      <button class="btn primary" id="planBuild">Build plan</button>
+      <button class="btn ghost" id="planStrategy" hidden>How should I work it?</button>
+    </div>
+    <div id="planOut" hidden></div>
+  </div>
+  </div>
+
+ </div>
+</section>
+
+<!-- ============================== VAULT ============================= -->
+<section class="view" id="view-vault">
+  <div class="card">
+    <div class="drop" id="vaultDrop">
+      <div class="drop-inner">
+        <div class="drop-icon">＋</div>
+        <p class="drop-title">Drop photos or files here</p>
+        <p class="drop-sub">Images, PDFs, notes — or click to pick</p>
+        <input type="file" id="vaultInput" multiple hidden>
+      </div>
+    </div>
+    <div class="row">
+      <select id="vaultKind"></select>
+      <input type="text" id="vaultCaption" placeholder="Caption (optional) — what is this?">
+      <select id="vaultExam"></select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead">
+      <h3>Everything saved</h3>
+      <select id="vaultFilter"></select>
+    </div>
+    <div id="vaultGrid" class="vaultgrid"></div>
+  </div>
+</section>
+
+<!-- ============================ PINBOARD ============================ -->
+<section class="view" id="view-board">
+  <div class="card">
+    <div class="cardhead">
+      <h3>Filter</h3>
+      <button class="btn small" id="newPinBtn">New pin</button>
+    </div>
+    <div id="pinTags" class="chips"></div>
+  </div>
+  <div id="pinGrid" class="pingrid"></div>
+</section>
+
+<!-- ============================= SHEET ============================== -->
+<section class="view" id="view-sheet">
+  <div class="card">
+    <div class="row nomargin">
+      <input type="text" id="sheetFocus" placeholder="Narrow it (optional) — e.g. 'just the antiarrhythmics'">
+      <button class="btn primary" id="sheetBtn">Build sheet</button>
+      <button class="btn ghost" id="sheetPrint" hidden>Print</button>
+    </div>
+  </div>
+  <div class="card md" id="sheetOut" hidden></div>
+</section>
+
+<!-- =========================== RESOURCES ============================ -->
+<section class="view" id="view-resources">
+  <div class="card">
+    <div class="row nomargin">
+      <input type="text" id="resTopic" placeholder="Topic — e.g. 'cardiac action potential', 'renal tubular acidosis'">
+      <button class="btn primary" id="resBtn">Search</button>
+    </div>
+    <p class="hint">Live web search with citations. Nothing about ratings is asserted without a source.</p>
+  </div>
+  <div class="card md" id="resOut" hidden></div>
+  <div class="card" id="resSources" hidden>
+    <h4>Pages searched</h4>
+    <ul id="resSourceList" class="srclist"></ul>
+  </div>
+</section>
+
+<!-- ============================ PROFILE ============================= -->
+<section class="view" id="view-profile">
+  <div class="card">
+    <div class="cardhead">
+      <h3 id="profileWho">Your profile</h3>
+      <button class="btn small" id="editUserBtn">Edit</button>
+    </div>
+    <div class="identity">
+      <div class="bigavatar" id="bigAvatar"></div>
+      <div class="idmeta">
+        <div id="profileHeadline" class="ptitle"></div>
+        <p class="hint" id="profileDetail"></p>
+        <p class="hint" id="profileCaveat"></p>
+      </div>
+    </div>
+    <p class="why">Every prompt in this tool carries the table below. It's the
+      reason the material looks the way it does.</p>
+    <div id="profileLeverList" class="levers"></div>
+    <div class="row">
+      <button class="btn" id="enterReportBtn">Enter report scores</button>
+      <button class="btn" id="runScreenerBtn">Run the screener</button>
+      <button class="btn ghost small" id="viewPromptBtn">See what the app tells Claude</button>
+    </div>
+    <div id="promptPreview" hidden></div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead">
+      <h2>Standing notes</h2>
+      <span class="hint">carried into every prompt</span>
+    </div>
+    <p class="why">Things no test measured but that keep needing to be said — what a professor stressed, what you keep mixing up, how you want material shown. Written once here, they travel with every request instead of being retyped into each new chat.</p>
+    <div class="row">
+      <select id="noteKind"></select>
+      <input type="text" id="noteText" placeholder="e.g. Professor said the boards weight this differently…">
+      <button class="btn primary" id="noteAdd">Add</button>
+    </div>
+    <div id="noteList" class="notelist"></div>
+  </div>
+  <div class="card">
+    <details id="noteCheck">
+      <summary class="bigsummary">Note check
+        <span class="sublabel">critique a set of notes on their shape</span>
+      </summary>
+
+      <p class="why">Pick a document from your vault, upload one, or paste text.
+        The measurements run offline; the written critique needs an API key.</p>
+
+      <div class="sourcetabs" id="noteSource">
+        <button class="stab on" data-src="paste">Paste text</button>
+        <button class="stab" data-src="vault">From the vault</button>
+        <button class="stab" data-src="upload">Upload a file</button>
+      </div>
+
+      <div class="srcpane" id="srcPaste">
+        <input type="text" id="noteTitle" placeholder="What are these notes on? (optional)">
+        <textarea id="noteBody" class="notearea" placeholder="Paste your notes here…"></textarea>
+      </div>
+
+      <div class="srcpane" id="srcVault" hidden>
+        <p class="hint">Text documents are read offline. Photos of handwriting need
+          an API key, and get read as images.</p>
+        <div id="noteVaultList" class="runlist"></div>
+      </div>
+
+      <div class="srcpane" id="srcUpload" hidden>
+        <div class="drop" id="noteDrop">
+          <div class="drop-inner">
+            <div class="drop-icon">＋</div>
+            <p class="drop-title">Drop a document here</p>
+            <p class="drop-sub">DOCX · PPTX · PDF · TXT · MD — or click to pick</p>
+            <input type="file" id="noteFile" hidden>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn primary" id="noteGo">Check these notes</button>
+        <label class="checkline" style="margin:0">
+          <input type="checkbox" id="noteWantCritique" checked>
+          <span>Include the written critique</span>
+        </label>
+      </div>
+
+      <div id="noteResult" hidden>
+        <h4>What the text measures</h4>
+        <div class="metrics" id="noteMetrics"></div>
+        <div id="noteFlags"></div>
+        <div id="noteCritique"></div>
+      </div>
+
+      <div id="notePast" hidden>
+        <h4>Earlier checks</h4>
+        <div id="noteTrend"></div>
+        <div id="noteList" class="runlist"></div>
+      </div>
+    </details>
+  </div>
+
+
+  <div class="card">
+    <details id="keysPanel">
+      <summary class="bigsummary">API keys
+        <span class="sublabel">more than one, tried in order</span>
+      </summary>
+      <p class="why">If the first key runs out mid-session the next one takes over in the same request — you shouldn't lose a question set at eleven at night because a balance hit zero.</p>
+      <div class="row">
+        <input type="text" id="keyLabel" placeholder="Name it (e.g. Personal)">
+        <input type="password" id="keySecret" placeholder="sk-ant-…">
+        <input type="text" id="keyWorkspace" placeholder="Workspace ID (only if asked for)">
+        <button class="btn primary" id="addKeyBtn">Add key</button>
+      </div>
+      <p class="hint" id="keyStatusLine"></p>
+      <div id="keyList" class="keylist"></div>
+      <button class="btn ghost small" id="wakeKeysBtn" hidden>Clear all cooldowns</button>
+    </details>
+  </div>
+
+  <div class="card">
+    <details id="backupPanel">
+      <summary class="bigsummary">Your data
+        <span class="sublabel">backups, and getting your history out</span>
+      </summary>
+      <p class="why">Your answer history is the one thing here that can't be regenerated. A copy is taken automatically every time the app starts, and the last ten are kept.</p>
+      <div class="row">
+        <button class="btn primary" id="bkNow">Back up now</button>
+        <button class="btn" id="bkDownloadDb">Download the database</button>
+        <button class="btn ghost" id="bkExportJson">Export as JSON</button>
+      </div>
+      <p class="hint">The JSON export doesn't need this app to be readable — it's your history in plain text.</p>
+      <div id="bkList" class="runlist"></div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>How to attack a question</h3>
+    <p class="why">Most of an NBME vignette is there to cost you time. This is how to read one.</p>
+    <div id="playbook" class="playbook"></div>
+  </div>
+
+  <div class="card">
+    <h3 id="scoresHead">Scores</h3>
+    <div class="scores" id="profileScores"></div>
+    <p class="hint" id="profileCaveatScores"></p>
+  </div>
+</section>
+
+</main>
+
+<div class="modal" id="modal" hidden>
+  <div class="modalcard">
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+    <div class="row modalactions">
+      <button class="btn primary" id="modalOk">Save</button>
+      <button class="btn ghost" id="modalCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
